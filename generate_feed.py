@@ -151,7 +151,9 @@ def build_rows(products, categories):
 
         description = clean_text(pt(product.get("description")), 5000) or title_base
         cats = product.get("categories") or []
-        product_category = category_path(by_id.get(cats[0]["id"], cats[0]), by_id) if cats else ""
+        paths = [category_path(by_id.get(c["id"], c), by_id) for c in cats]
+        # Usa a categoria mais especifica (caminho mais longo), nao a primeira da lista
+        product_category = max(paths, key=lambda p: (p.count(" > "), len(p)), default="")
 
         attributes = [pt(a) for a in (product.get("attributes") or [])]
         variants = product.get("variants") or []
