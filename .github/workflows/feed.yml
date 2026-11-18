@@ -1,0 +1,43 @@
+name: Feed ChatGPT Ads
+
+on:
+  schedule:
+    - cron: "17 8 * * *"   # todo dia, 05:17 de Brasilia
+  workflow_dispatch:        # botao "Run workflow" para rodar na hora
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - name: Gerar feed
+        env:
+          NUVEMSHOP_TOKEN: ${{ secrets.NUVEMSHOP_TOKEN }}
+          STORE_ID: ${{ vars.STORE_ID }}
+        run: python generate_feed.py
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
