@@ -2,7 +2,7 @@ name: Feed ChatGPT Ads
 
 on:
   schedule:
-    - cron: "17 8 * * *"   # todo dia, 05:17 de Brasilia
+        - cron: "17 */6 * * *"   # a cada 6 horas
   workflow_dispatch:        # botao "Run workflow" para rodar na hora
 
 permissions:
